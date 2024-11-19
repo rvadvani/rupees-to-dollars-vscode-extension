@@ -10,7 +10,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:rupeesToDollars.convert"
+    "onCommand:rupeesToDollars.convert",
+    "onCommand:dollarsToRupees.convert"
   ],
   "main": "./extension.js",
   "contributes": {
@@ -18,6 +19,10 @@
       {
         "command": "rupeesToDollars.convert",
         "title": "Convert Rupees to Dollars"
+      },
+      {
+        "command": "dollarsToRupees.convert",
+        "title": "Convert Dollars to Rupees"
       }
     ]
   },

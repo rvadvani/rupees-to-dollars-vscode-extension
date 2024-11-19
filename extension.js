@@ -5,8 +5,8 @@ const axios = require('axios');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-    let disposable = vscode.commands.registerCommand('rupeesToDollars.convert', async () => {
-        // Get user input for the amount in rupees
+    // Command to convert Rupees to Dollars
+    let rupeesToDollarsCommand = vscode.commands.registerCommand('rupeesToDollars.convert', async () => {
         const input = await vscode.window.showInputBox({
             prompt: "Enter the amount in INR (Rupees)",
             placeHolder: "E.g., 1000"
@@ -19,7 +19,6 @@ function activate(context) {
 
         const amountInRupees = parseFloat(input);
 
-        // Fetch the exchange rate using an API
         try {
             const response = await axios.get('https://api.exchangerate-api.com/v4/latest/INR');
             const exchangeRate = response.data.rates.USD;
@@ -39,7 +38,41 @@ function activate(context) {
         }
     });
 
-    context.subscriptions.push(disposable);
+    // Command to convert Dollars to Rupees
+    let dollarsToRupeesCommand = vscode.commands.registerCommand('dollarsToRupees.convert', async () => {
+        const input = await vscode.window.showInputBox({
+            prompt: "Enter the amount in USD (Dollars)",
+            placeHolder: "E.g., 50"
+        });
+
+        if (!input || isNaN(input)) {
+            vscode.window.showErrorMessage("Please enter a valid number.");
+            return;
+        }
+
+        const amountInDollars = parseFloat(input);
+
+        try {
+            const response = await axios.get('https://api.exchangerate-api.com/v4/latest/USD');
+            const exchangeRate = response.data.rates.INR;
+
+            if (exchangeRate) {
+                const convertedAmount = (amountInDollars * exchangeRate).toFixed(2);
+                vscode.window.showInformationMessage(
+                    `${amountInDollars} USD is approximately ${convertedAmount} INR.`
+                );
+            } else {
+                throw new Error("Exchange rate not found.");
+            }
+        } catch (error) {
+            vscode.window.showErrorMessage(
+                "Failed to fetch exchange rate. Please try again later."
+            );
+        }
+    });
+
+    context.subscriptions.push(rupeesToDollarsCommand);
+    context.subscriptions.push(dollarsToRupeesCommand);
 }
 
 function deactivate() {}
